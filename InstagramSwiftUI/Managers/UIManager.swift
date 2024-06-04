@@ -10,8 +10,15 @@ import UIKit
 
 let UIManager = _UIManager()
 class _UIManager {
+    init(){ }
     
-    //MARK: - TabBar
+    // Add Other UI Functionality
+
+    
+}
+
+//MARK: - TabBar
+extension _UIManager {
     /// Configures the tab bar to have an opaque background.
     ///
     /// This function sets up the `UITabBarAppearance` for the tab bar and applies
@@ -32,8 +39,10 @@ class _UIManager {
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
-    
-    //MARK: - NavigationBar
+}
+
+//MARK: - NavigationBar
+extension _UIManager {
     /// Configures the navigation bar to have an opaque background.
     func makeNavigationBarOpaque() {
         let appearance = UINavigationBarAppearance()
@@ -54,5 +63,4 @@ class _UIManager {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
     }
-    
 }
