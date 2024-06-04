@@ -1,5 +1,5 @@
 //
-//  TextFieldModifier.swift
+//  TextFieldViewModifier.swift
 //  InstagramSwiftUI
 //
 //  Created by HardiB.Salih on 6/4/24.

@@ -54,4 +54,5 @@ class _UIManager {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
     }
+    
 }

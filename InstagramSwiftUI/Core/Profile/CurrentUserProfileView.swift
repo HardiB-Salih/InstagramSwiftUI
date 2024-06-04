@@ -8,11 +8,51 @@
 import SwiftUI
 
 struct CurrentUserProfileView: View {
+    let user: User
+    
+    var posts: [Post] {
+        return Post.MOCK_POSTS.filter({ $0.user?.username == self.user.username })
+    }
+    
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            ScrollView {
+                //MARK: - Header Area
+                ProfileHeaderView(user: user)
+                    .padding(.top)
+                
+                //MARK: - PostGridView
+                PostGridView(posts: posts)
+            }
+            .scrollIndicators(.hidden)
+            .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                topBarTrailing()
+            }
+        }
     }
 }
 
-#Preview {
-    CurrentUserProfileView()
+//MARK: -ToolbarContentBuilder
+extension CurrentUserProfileView {
+    @ToolbarContentBuilder
+    private func topBarTrailing() -> some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(action: {}, label: {
+                Text("Sign out")
+                    .font(.headline)
+                    .foregroundStyle(Color(.label))
+            })
+            
+        }
+    }
 }
+
+
+#Preview {
+    CurrentUserProfileView(user: User.MOCK_USERS.randomElement()!)
+}
+
+
