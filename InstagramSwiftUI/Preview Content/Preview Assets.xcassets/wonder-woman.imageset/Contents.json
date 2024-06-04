@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "wonder-woman.jpg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
