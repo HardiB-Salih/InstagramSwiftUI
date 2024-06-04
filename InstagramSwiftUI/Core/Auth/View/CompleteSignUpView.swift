@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct CompleteSignUpView: View {
-    @State private var password = ""
     @Environment(\.dismiss) private var dismiss
-    
+    @EnvironmentObject var viewModel: RegistrationViewModel
+    @State private var isLoading = false
+
     var body: some View {
         VStack(spacing: 12) {
             VStack {
                 Text("Welcom to instagram,")
-                Text("hardib.salih")
+                Text(viewModel.username)
             }
             .font(.title2)
             .fontWeight(.bold)
@@ -30,13 +31,26 @@ struct CompleteSignUpView: View {
             
             // MARK: - Sign up
             Button {
-                print("Sign up the User")
+                isLoading = true
+                Task {
+                    await viewModel.createUser()
+                    isLoading = false
+                }
             } label: {
-                Text("Complete Sign Up")
-                    .instaButtonViewModifier()
-                    .padding(.top)
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(.white)
+                        .instaButtonViewModifier()
+                } else {
+                    Text("Complete Sign Up")
+                        .instaButtonViewModifier()
+                        
+                }
+                
             }
-            
+            .padding(.top)
+            .disabled(isLoading)
         }
         .padding()
         .navigationBarBackButtonHidden()

@@ -40,7 +40,9 @@ extension CurrentUserProfileView {
     @ToolbarContentBuilder
     private func topBarTrailing() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button(action: {}, label: {
+            Button(action: {
+                AuthService.shared.signout()
+            }, label: {
                 Text("Sign out")
                     .font(.headline)
                     .foregroundStyle(Color(.label))

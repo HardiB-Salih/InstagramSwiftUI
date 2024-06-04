@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
+    @StateObject private var loginViewModel = LoginViewModel()
+    @State private var isLoading = false
     
     var body: some View {
         NavigationStack {
@@ -25,11 +25,11 @@ struct LoginView: View {
                 
                 // MARK: - TextField
                 VStack {
-                    TextField("Enter your email", text: $email)
+                    TextField("Enter your email", text: $loginViewModel.email)
                         .textInputAutocapitalization(.never)
                         .instaTextFieldViewModifier()
                     
-                    SecureField("Enter your password", text: $password)
+                    SecureField("Enter your password", text: $loginViewModel.password)
                         .instaTextFieldViewModifier()
                 }
                 
@@ -48,11 +48,25 @@ struct LoginView: View {
                 
                 // MARK: - Sign in
                 Button {
-                    print("Sign in")
+                    isLoading = true
+                    Task {
+                        await loginViewModel.signIn()
+                        isLoading = false
+                    }
                 } label: {
-                    Text("Sign in")
-                        .instaButtonViewModifier()
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                            .instaButtonViewModifier()
+                    } else {
+                        Text("Sign in")
+                            .instaButtonViewModifier()
+                    }
+                    
                 }
+                .disabled(isLoading ? true : !formIsValid)
+                .opacity(formIsValid ? 1 : 0.7)
                 
                 // MARK: - Divider With Text
                 HStack {
@@ -94,6 +108,7 @@ struct LoginView: View {
                 // MARK: - Navigate To AddEmailView
                 NavigationLink {
                     AddEmailView()
+                        
                 } label: {
                     HStack {
                         Text("Don't have an account? ") +
@@ -107,6 +122,14 @@ struct LoginView: View {
             }
             .padding(.horizontal)
         }
+    }
+}
+
+extension LoginView: AuthenticationFormProtocol {
+    var formIsValid: Bool {
+        let isEmailValid = loginViewModel.email.isValidEmail
+        let isPasswordValid = loginViewModel.password.isPasswordValid
+        return isEmailValid && isPasswordValid
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  AddUserNameView.swift
+//  AddPasswordView.swift
 //  InstagramSwiftUI
 //
 //  Created by HardiB.Salih on 6/4/24.
@@ -7,35 +7,36 @@
 
 import SwiftUI
 
-struct AddUserNameView: View {
-    @State private var username = ""
+struct AddPasswordView: View {
     @Environment(\.dismiss) private var dismiss
-    
+    @EnvironmentObject var viewModel: RegistrationViewModel
+
     var body: some View {
         VStack(spacing: 12) {
-            Text("Create Username")
+            Text("Create a password")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
             
-            Text("You'll use this email to sign in to your account")
+            Text("Your password must be at least 6 charecters in length")
                 .font(.footnote)
                 .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
             
             // MARK: - TextField
-            TextField("Enter your username", text: $username)
-                .textInputAutocapitalization(.never)
+            SecureField("Enter your password", text: $viewModel.password)
                 .instaTextFieldViewModifier()
             
-            // MARK: - Navigate To AddPasswordView
+            // MARK: - Navigate To CompleteSignUpView
             NavigationLink {
-                AddPasswordView()
+                CompleteSignUpView()
             } label: {
                 Text("Next")
                     .instaButtonViewModifier()
             }
+            .disabled(!formIsValid)
+            .opacity(formIsValid ? 1 : 0.7)
             Spacer()
         }
         .padding()
@@ -45,7 +46,7 @@ struct AddUserNameView: View {
 }
 
 //MARK: -ToolbarContentBuilder
-extension AddUserNameView {
+extension AddPasswordView {
     @ToolbarContentBuilder
     private func topBarLeading() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
@@ -58,6 +59,12 @@ extension AddUserNameView {
     }
 }
 
+extension AddPasswordView: AuthenticationFormProtocol {
+    var formIsValid: Bool {
+        return viewModel.password.isPasswordValid
+    }
+}
+
 #Preview {
-    AddUserNameView()
+    AddPasswordView()
 }

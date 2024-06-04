@@ -1,5 +1,5 @@
 //
-//  AddEmailView.swift
+//  AddUserNameView.swift
 //  InstagramSwiftUI
 //
 //  Created by HardiB.Salih on 6/4/24.
@@ -7,13 +7,14 @@
 
 import SwiftUI
 
-struct AddEmailView: View {
-    @State private var email = ""
+struct AddUserNameView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var viewModel: RegistrationViewModel
+
     
     var body: some View {
         VStack(spacing: 12) {
-            Text("Add your email")
+            Text("Create Username")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
@@ -25,28 +26,29 @@ struct AddEmailView: View {
                 .padding(.horizontal, 24)
             
             // MARK: - TextField
-            TextField("Enter your email", text: $email)
+            TextField("Enter your username", text: $viewModel.username)
                 .textInputAutocapitalization(.never)
                 .instaTextFieldViewModifier()
             
-            // MARK: - Navigate To AddUserNameView
+            // MARK: - Navigate To AddPasswordView
             NavigationLink {
-                AddUserNameView()
+                AddPasswordView()
             } label: {
                 Text("Next")
                     .instaButtonViewModifier()
             }
-
+            .disabled(!formIsValid)
+            .opacity(formIsValid ? 1 : 0.7)
             Spacer()
         }
-        .navigationBarBackButtonHidden()
         .padding()
+        .navigationBarBackButtonHidden()
         .toolbar { topBarLeading() }
     }
 }
 
 //MARK: -ToolbarContentBuilder
-extension AddEmailView {
+extension AddUserNameView {
     @ToolbarContentBuilder
     private func topBarLeading() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
@@ -59,11 +61,14 @@ extension AddEmailView {
     }
 }
 
-
-
-
+extension AddUserNameView: AuthenticationFormProtocol {
+    var formIsValid: Bool {
+        let trimmedUsername = viewModel.username.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmedUsername.isEmpty && trimmedUsername.count >= 3
+    }
+}
 
 
 #Preview {
-    AddEmailView()
+    AddUserNameView()
 }

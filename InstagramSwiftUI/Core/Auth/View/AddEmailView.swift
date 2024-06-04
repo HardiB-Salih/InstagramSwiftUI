@@ -1,5 +1,5 @@
 //
-//  AddPasswordView.swift
+//  AddEmailView.swift
 //  InstagramSwiftUI
 //
 //  Created by HardiB.Salih on 6/4/24.
@@ -7,44 +7,48 @@
 
 import SwiftUI
 
-struct AddPasswordView: View {
-    @State private var password = ""
+struct AddEmailView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var viewModel: RegistrationViewModel
     
     var body: some View {
         VStack(spacing: 12) {
-            Text("Create a password")
+            Text("Add your email")
                 .font(.title2)
                 .fontWeight(.bold)
                 .padding(.top)
             
-            Text("Your password must be at least 6 charecters in length")
+            Text("You'll use this email to sign in to your account")
                 .font(.footnote)
                 .foregroundStyle(.gray)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
             
             // MARK: - TextField
-            SecureField("Enter your password", text: $password)
+            TextField("Enter your email", text: $viewModel.email)
+                .textInputAutocapitalization(.never)
                 .instaTextFieldViewModifier()
             
-            // MARK: - Navigate To CompleteSignUpView
+            // MARK: - Navigate To AddUserNameView
             NavigationLink {
-                CompleteSignUpView()
+                AddUserNameView()
             } label: {
                 Text("Next")
                     .instaButtonViewModifier()
             }
+            .disabled(!formIsValid)
+            .opacity(formIsValid ? 1 : 0.7)
+
             Spacer()
         }
-        .padding()
         .navigationBarBackButtonHidden()
+        .padding()
         .toolbar { topBarLeading() }
     }
 }
 
 //MARK: -ToolbarContentBuilder
-extension AddPasswordView {
+extension AddEmailView {
     @ToolbarContentBuilder
     private func topBarLeading() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
@@ -57,6 +61,15 @@ extension AddPasswordView {
     }
 }
 
+extension AddEmailView: AuthenticationFormProtocol {
+    var formIsValid: Bool {
+        return viewModel.email.isValidEmail
+    }
+}
+
+
+
+
 #Preview {
-    AddPasswordView()
+    AddEmailView()
 }
