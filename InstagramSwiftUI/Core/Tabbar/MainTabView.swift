@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct MainTabView: View {
+    let user: User
     @State private var selectedTab = 0
     @State private var showCreateThread = false
     @Namespace private var tabAnimation
     
-    init(){
+    init(user: User){
+        self.user = user
         UIManager.setNavigationBarBackgroundColor(UIColor.secondarySystemBackground)
         UIManager.changeTabBarBackgroundColor(to: UIColor.secondarySystemBackground)
     }
@@ -56,7 +58,7 @@ struct MainTabView: View {
                 .tag(3)
             
             //MARK: - ProfileView
-            CurrentUserProfileView(user: User.MOCK_USERS.randomElement()!)
+            CurrentUserProfileView(user: user)
                 .tabItem {
                     Image(systemName: selectedTab == 4 ? "person.fill" : "person")
                         .environment(\.symbolVariants, selectedTab == 4 ? .fill : .none)
@@ -82,5 +84,5 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView()
+    MainTabView(user: User.MOCK_USERS.randomElement()!)
 }

@@ -14,7 +14,6 @@ struct CurrentUserProfileView: View {
         return Post.MOCK_POSTS.filter({ $0.user?.username == self.user.username })
     }
     
-    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -41,7 +40,7 @@ extension CurrentUserProfileView {
     private func topBarTrailing() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Button(action: {
-                AuthService.shared.signout()
+                AuthService.signout()
             }, label: {
                 Text("Sign out")
                     .font(.headline)

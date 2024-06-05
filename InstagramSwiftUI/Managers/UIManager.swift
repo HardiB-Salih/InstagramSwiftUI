@@ -8,12 +8,11 @@
 import SwiftUI
 import UIKit
 
+
 let UIManager = _UIManager()
 class _UIManager {
     init(){ }
     
-    // Add Other UI Functionality
-
     
 }
 

@@ -8,26 +8,24 @@
 import SwiftUI
 
 struct ProfileHeaderView: View {
+    @State private var showEditView = false
     let user : User
     
     var body: some View {
         VStack (spacing: 10) {
             HStack {
-                Image(user.profileImageUrl ?? "iron-man")
-                    .resizable()
-                    .clipShape(Circle())
+                RoundedImageView(user.profileImageUrl, size: .xLarge, shape: .circle)
                     .padding(3)
-                    .overlay { Circle().stroke(Color(.systemGray5), lineWidth: 1) }
-                    .frame(width: 100, height: 100)
-                
-                
+                    .overlay {
+                        Circle()
+                            .stroke(Color(.systemGray4), lineWidth: 1.0)
+                    }
                 
                 HStack(spacing: 8) {
                     UserStatView(value: 3, title: "Posts")
                     UserStatView(value: 6, title: "Followers")
                     UserStatView(value: 11, title: "Followring")
                 }
-                
                 Spacer()
             }
             .padding(.horizontal)
@@ -45,14 +43,23 @@ struct ProfileHeaderView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             
             
-            Button(action: {}, label: {
-                Text("Edit Profile")
+            Button(action: {
+                if user.isCurrentUser {
+                    showEditView.toggle()
+                } else {
+                 print("Follow User")
+                }
+                
+                
+            }, label: {
+                Text(user.isCurrentUser ? "Edit Profile" : "Follow")
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .foregroundStyle(Color(.label))
-                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .padding(.vertical, 6)
+                    .foregroundStyle(user.isCurrentUser ? Color(.label) : Color(.systemBackground))
+                    .background(user.isCurrentUser ? Color(.systemBackground) : Color(.systemBlue))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .overlay {
-                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .stroke(Color(.systemGray4), lineWidth: 1)
                     }
                     .padding(.horizontal)
@@ -60,5 +67,12 @@ struct ProfileHeaderView: View {
             
             Divider()
         }
+        .fullScreenCover(isPresented: $showEditView) {
+            NavigationStack { EditProfileView(user: user) }
+        }
     }
 }
+
+//#Preview {
+//    ProfileHeaderView(user: User.MOCK_USERS.first!)
+//}

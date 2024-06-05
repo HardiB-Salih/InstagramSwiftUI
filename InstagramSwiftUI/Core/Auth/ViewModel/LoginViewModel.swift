@@ -10,12 +10,12 @@ import Foundation
 class LoginViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
-    private let authService = AuthService.shared
     
     
+    @MainActor
     func signIn() async {
         do {
-            try await authService.login(withEmail: email, password: password)
+            try await AuthService.login(withEmail: email, password: password)
             resetFields()
         } catch {
             print("🙀 Something went wrong Log in the user because: \(error.localizedDescription)")

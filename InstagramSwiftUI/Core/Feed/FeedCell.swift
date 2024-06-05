@@ -15,12 +15,13 @@ struct FeedCell: View {
         VStack (spacing: 0){
             //MARK: - Image + username
             HStack {
-                Image(post.user?.profileImageUrl ?? "iron-man")
-                    .resizable()
-                    .clipShape(Circle())
+                RoundedImageView(post.user?.profileImageUrl, size: .xSmall, shape: .circle)
                     .padding(3)
-                    .overlay { Circle().stroke(Color(.systemGray5), lineWidth: 1) }
-                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Circle()
+                            .stroke(Color(.systemGray4), lineWidth: 1.0)
+                    }
+
                 
                 Text(post.user?.username ?? "")
                     .font(.footnote)

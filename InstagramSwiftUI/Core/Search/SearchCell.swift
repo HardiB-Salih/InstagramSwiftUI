@@ -12,12 +12,12 @@ struct SearchCell: View {
     
     var body: some View {
         HStack {
-            Image(user.profileImageUrl ?? "iron-man")
-                .resizable()
-                .clipShape(Circle())
+            RoundedImageView(user.profileImageUrl, size: .xSmall, shape: .circle)
                 .padding(3)
-                .overlay { Circle().stroke(Color(.systemGray5), lineWidth: 1) }
-                .frame(width: 40, height: 40)
+                .overlay {
+                    Circle()
+                        .stroke(Color(.systemGray4), lineWidth: 1.0)
+                }
             
             VStack (alignment: .leading){
                 Text(user.username)
