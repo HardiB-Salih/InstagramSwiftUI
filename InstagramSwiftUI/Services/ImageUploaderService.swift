@@ -128,7 +128,7 @@ class ImageUploaderService {
     ///     print("Failed to extract path")
     /// }
     /// ```
-    func extractPath(fromUrl url: String) -> String? {
+    private func extractPath(fromUrl url: String) -> String? {
         let pattern = "https://firebasestorage.googleapis.com:443/v0/b/\(PROJECT_ID).appspot.com/o/"
 
         guard let range = url.range(of: pattern) else { return nil }

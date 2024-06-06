@@ -6,9 +6,35 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct FeedCell: View {
-    let post : Post
+    @State private var isAnimating = false
+    @ObservedObject private var viewModel : FeedCellViewModel
+    var post: Post {
+        return viewModel.post
+    }
+    
+    var didLike: Bool {
+        return self.post.didLike ?? false
+    }
+    
+    init(post: Post) {
+        self.viewModel = FeedCellViewModel(post: post)
+    }
+    
+    
+    private func handleLikeTapped() {
+        Task {
+            if didLike {
+                await viewModel.unLike()
+                print("🤷 didLike is \(didLike)")
+            } else {
+                await viewModel.like()
+                print("🙀 didLike is \(didLike)")
+            }
+        }
+    }
     
     
     var body: some View {
@@ -21,7 +47,7 @@ struct FeedCell: View {
                         Circle()
                             .stroke(Color(.systemGray4), lineWidth: 1.0)
                     }
-
+                
                 
                 Text(post.user?.username ?? "")
                     .font(.footnote)
@@ -33,7 +59,7 @@ struct FeedCell: View {
             .padding(.bottom, 8)
             
             //MARK: - Post Image
-            Image(MockSamples.photos.randomElement() ?? "iron-man")
+            KFImage(post.postImageURL)
                 .resizable()
                 .scaledToFill()
                 .frame(maxWidth: .infinity)
@@ -43,11 +69,20 @@ struct FeedCell: View {
             //MARK: - Action Buttons
             HStack(spacing: 16) {
                 Button(action: {
-                    print("Like a Post")
+                    handleLikeTapped()
+                    withAnimation(.smooth(duration: 0.3)) {
+                        isAnimating = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isAnimating = false
+                    }
                 }, label: {
-                    Image(systemName: "suit.heart")
+                    Image(systemName: didLike ? "suit.heart.fill" : "suit.heart")
+                        .foregroundStyle(Color(didLike ? .systemRed : .label))
                         .font(.system(size: 20))
                         .imageScale(.large)
+                        .scaleEffect(isAnimating ? 1.4 : 1.0)
+                    
                 })
                 
                 Button(action: {
@@ -72,12 +107,15 @@ struct FeedCell: View {
             .foregroundStyle(Color(.label))
             
             //MARK: - Like label
-            Text("\(post.like) Likes")
-                .font(.footnote)
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 12)
-                
+            if post.likes >= 0 || post.likes <= 0 {
+                Text("\(post.likes) Likes")
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 12)
+            }
+            
+            
             
             //MARK: - Caption label
             HStack {

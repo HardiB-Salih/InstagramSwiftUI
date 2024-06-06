@@ -5,7 +5,7 @@
 //  Created by HardiB.Salih on 6/4/24.
 //
 
-import Foundation
+import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseFirestoreSwift
@@ -33,24 +33,20 @@ enum AuthServiceError: Error {
     }
 }
 
-var AuthService = _AuthService()
-class _AuthService: ObservableObject {
+class AuthService: ObservableObject {
     @Published var userSession: FirebaseAuth.User?
-    @Published var currentUser: User?
 
-//    static let shared = AuthService()
+    static let shared = AuthService()
     
     init() {
-        Task {
-            try await fetchCurrentUser()
-        }
+        self.userSession = Auth.auth().currentUser
     }
     
     @MainActor
     func login(withEmail email: String, password: String) async throws {
         do {
-            _ = try await Auth.auth().signIn(withEmail: email, password: password)
-            try await fetchCurrentUser()
+            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
+            self.userSession = authResult.user
         } catch {
             throw AuthServiceError.firebaseAuthError(error.localizedDescription)
         }
@@ -80,24 +76,8 @@ class _AuthService: ObservableObject {
         }
     }
     
-        func fetchCurrentUser() async throws {
-            guard let currentUid = Auth.auth().currentUser?.uid else { return }
-    
-            do {
-                let document = try await FirestoreCollections.users.document(currentUid).getDocument()
-                let user = try document.data(as: User.self)
-                self.userSession = Auth.auth().currentUser
-                self.currentUser = user
-            } catch {
-                throw error
-            }
-        }
     func signout() {
-        do {
-            try Auth.auth().signOut()
-            self.userSession = nil
-        } catch {
-            print(AuthServiceError.signOutError(error.localizedDescription))
-        }
+        try? Auth.auth().signOut()
+//        self.userSession = nil
     }
 }

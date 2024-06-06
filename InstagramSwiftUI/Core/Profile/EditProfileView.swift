@@ -103,7 +103,8 @@ extension EditProfileView {
                     try await viewModel.updateUserData()
                     dismiss()
                 }
-            }.disabled(viewModel.isUploading)
+            }
+            .disabled(viewModel.isUploading)
         }
     }
 }

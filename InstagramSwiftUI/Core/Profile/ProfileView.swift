@@ -21,7 +21,7 @@ struct ProfileView: View {
                 .padding(.top)
             
             //MARK: - PostGridView
-            PostGridView(posts: posts)
+            PostGridView(user: user)
         }
         .scrollIndicators(.hidden)
         .navigationTitle("Profile")

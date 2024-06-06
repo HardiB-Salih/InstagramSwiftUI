@@ -29,10 +29,11 @@ struct RoundedImageView: View {
     //MARK: - INIT
     init(_ profileImageUrl: String? = nil,
          size: Size,
-         shape: ImageShape) {
+         shape: ImageShape, fallbackImage: String = "person.fill") {
         self.profileImageUrl = profileImageUrl
         self.size = size
         self.shape = shape
+        self.fallbackImage = fallbackImage
     }
     
     //MARK: - View
@@ -56,6 +57,7 @@ struct RoundedImageView: View {
 
             Image(systemName: fallbackImage)
                 .resizable()
+                .scaledToFit()
                 .foregroundStyle(.white)
                 .padding(8)
         }

@@ -14,7 +14,7 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if viewModel.userSession != nil || Auth.auth().currentUser != nil  {
+            if viewModel.userSession != nil  {
                 if let currentUser = viewModel.currentUser {
                     MainTabView(user: currentUser)
                 }

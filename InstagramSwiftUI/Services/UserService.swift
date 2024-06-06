@@ -39,17 +39,17 @@ class UserService {
     ///     print("Failed to fetch current user: \(error)")
     /// }
     /// ```
-//    func fetchCurrentUser() async throws -> User? {
-//        guard let currentUid = Auth.auth().currentUser?.uid else { return nil }
-//        
-//        do {
-//            let document = try await FirestoreCollections.users.document(currentUid).getDocument()
-//            let user = try document.data(as: User.self)
-//            return user
-//        } catch {
-//            throw error
-//        }
-//    }
+    func fetchCurrentUser() async throws -> User? {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return nil }
+        
+        do {
+            let document = try await FirestoreCollections.users.document(currentUid).getDocument()
+            let user = try document.data(as: User.self)
+            return user
+        } catch {
+            throw error
+        }
+    }
 
     
     
@@ -80,7 +80,6 @@ class UserService {
         do {
             let query = FirestoreCollections.users
                 .whereField("id", isNotEqualTo: currentUid)
-                .limit(to: 5)
             let snapshot = try await query.getDocuments()
             let data = snapshot.documents.compactMap { try? $0.data(as: User.self) }
             
@@ -90,9 +89,29 @@ class UserService {
         }
     }
     
+    func fetchUserBy(userId id: String) async throws -> User {
+        do {
+            let document = try await FirestoreCollections.users.document(id).getDocument()
+            let user = try document.data(as: User.self)
+            return user
+        } catch {
+            throw error
+        }
+    }
     
-//    func updateUserData(byUserId uid: String) async throws {
-//        
-//    }
+    static func fetchUsers(by userIds: [String]) async throws -> [String: User] {
+        guard !userIds.isEmpty else { return [:] }
 
+        let db = Firestore.firestore()
+        let userDocs = try await db.collection("users").whereField("uid", in: userIds).getDocuments()
+
+        var users: [String: User] = [:]
+        for document in userDocs.documents {
+            guard let userId = document.data()["id"] as? String else { continue }
+          let user = try document.data(as: User.self)
+          users[userId] = user
+        }
+
+        return users
+      }
 }

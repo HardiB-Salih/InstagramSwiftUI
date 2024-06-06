@@ -15,7 +15,7 @@ class LoginViewModel: ObservableObject {
     @MainActor
     func signIn() async {
         do {
-            try await AuthService.login(withEmail: email, password: password)
+            try await AuthService.shared.login(withEmail: email, password: password)
             resetFields()
         } catch {
             print("🙀 Something went wrong Log in the user because: \(error.localizedDescription)")

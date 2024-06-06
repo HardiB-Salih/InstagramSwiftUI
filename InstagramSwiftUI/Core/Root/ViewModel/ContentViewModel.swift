@@ -23,35 +23,27 @@ class ContentViewModel: ObservableObject {
     }
 
     private func setUpSubscribers() {
-        AuthService.$userSession
+        AuthService.shared.$userSession
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userSession in
                 guard let self else { return }
                 guard let userSession else { return }
                 self.userSession = userSession
-            }
-            .store(in: &cancellables)
-        
-        AuthService.$currentUser
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] currentUser in
-                guard let self else { return }
-                guard let currentUser else { return }
-                self.currentUser = currentUser
+                self.fetchCurrentUser()
             }
             .store(in: &cancellables)
     }
 
-//    private func fetchCurrentUser() {
-//        guard userSession != nil else { return }
-//
-//        Task {
-//            do {
-//                self.currentUser = try await UserService.shared.fetchCurrentUser()
-//                print("✅ Current User \(String(describing: self.currentUser?.id))")
-//            } catch {
-//                print("❌ Failed to fetch current user: \(error)")
-//            }
-//        }
-//    }
+    private func fetchCurrentUser() {
+        guard userSession != nil else { return }
+
+        Task {
+            do {
+                self.currentUser = try await UserService.shared.fetchCurrentUser()
+                print("✅ Current User \(String(describing: self.currentUser?.id))")
+            } catch {
+                print("❌ Failed to fetch current user: \(error)")
+            }
+        }
+    }
 }

@@ -65,7 +65,7 @@ class EditProfileViewModel : ObservableObject {
         
         if !data.isEmpty {
             try await FirestoreCollections.users.document(user.id).updateData(data)
-            try await AuthService.fetchCurrentUser()
+//            self.user = try await UserService.shared.fetchCurrentUser()
         }
     }
      

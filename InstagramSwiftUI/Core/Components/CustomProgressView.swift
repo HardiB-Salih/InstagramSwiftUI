@@ -64,7 +64,6 @@ struct CustomProgressView: View {
                         RoundedRectangle(cornerRadius: 25, style: .continuous)
                             .fill(Color(.systemGray6))
                             .frame(width: max(80, geometry.size.width), height: max(80, geometry.size.width))
-                            .shadow(radius: 10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 25, style: .continuous)
                                     .stroke(Color(.systemGray4), lineWidth: 1.0)

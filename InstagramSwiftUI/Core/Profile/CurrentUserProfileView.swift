@@ -22,7 +22,7 @@ struct CurrentUserProfileView: View {
                     .padding(.top)
                 
                 //MARK: - PostGridView
-                PostGridView(posts: posts)
+                PostGridView(user: user)
             }
             .scrollIndicators(.hidden)
             .navigationTitle("Profile")
@@ -40,7 +40,7 @@ extension CurrentUserProfileView {
     private func topBarTrailing() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Button(action: {
-                AuthService.signout()
+                AuthService.shared.signout()
             }, label: {
                 Text("Sign out")
                     .font(.headline)
