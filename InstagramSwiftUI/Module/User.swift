@@ -21,6 +21,8 @@ struct User: Identifiable , Codable {
         guard let currentUid = Auth.auth().currentUser?.uid else { return false }
         return currentUid == id
     }
+    
+    var isFollowed: Bool? = false
 }
 
 extension User: Hashable { }
@@ -32,6 +34,7 @@ extension String {
    static let fullname = "fullname"
    static let bio = "bio"
    static let email = "email"
+    
 }
 extension User {
     static var MOCK_USERS: [User] {

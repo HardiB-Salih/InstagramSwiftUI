@@ -21,6 +21,10 @@ struct Post : Identifiable, Codable {
         return URL(string: imageUrl)
     }
     
+    var stringTimestamp: String {
+        return timestamp.timestampString()
+    }
+    
 }
 
 extension Post: Hashable { }

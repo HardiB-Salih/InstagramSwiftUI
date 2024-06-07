@@ -17,7 +17,7 @@ class SearchViewModel: ObservableObject {
     @MainActor
     private func fetchUsers() async {
         do {
-            users = try await UserService.shared.fetchAllUsers()
+            users = try await UserService.fetchAllUsers()
         } catch {
             print("🙀 Where is users? \(error.localizedDescription)")
         }

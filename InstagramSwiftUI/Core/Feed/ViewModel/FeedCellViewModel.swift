@@ -14,17 +14,16 @@ class FeedCellViewModel: ObservableObject {
     
     init(post: Post) {
         self.post = post
-        Task {
-            await checkIfUserLikePost()
-        }
+        checkIfUserLikePost()
     }
     
     func like() async {
-        let postCopy = post
-        post.didLike = true
-        post.likes += 1
+        
         do {
+            let postCopy = post
+            post.likes += 1
             try await PostService.likePost(postCopy)
+            post.didLike = true
         } catch {
             print(error.localizedDescription)
             post.didLike = false
@@ -33,11 +32,11 @@ class FeedCellViewModel: ObservableObject {
     }
     
     func unLike() async {
-        let postCopy = post
-        post.didLike = false
-        post.likes -= 1
         do {
+            let postCopy = post
+            post.likes -= 1
             try await PostService.unLikePost(postCopy)
+            post.didLike = false
         } catch {
             print(error.localizedDescription)
             post.didLike = true
@@ -45,13 +44,14 @@ class FeedCellViewModel: ObservableObject {
         }
     }
     
-    func checkIfUserLikePost() async {
-        do {
-            self.post.didLike = try await PostService.checkIfUserLikePost(post)
-        } catch {
-            print("🙀 Network issue")
+    func checkIfUserLikePost() {
+        PostService.checkIfUserLikePost(post) { result in
+            switch result {
+            case .success(let didLike):
+                self.post.didLike = didLike
+            case .failure(_):
+                print("🙀 You Did Not Like this Post")
+            }
         }
-       
     }
-    
 }

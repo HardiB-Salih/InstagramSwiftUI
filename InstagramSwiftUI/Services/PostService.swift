@@ -31,7 +31,7 @@ extension PostService {
         let userLikesRef = FirestoreCollections.users.document(currentUserId).collection(.userLikes).document(post.id)
         let postRef = FirestoreCollections.posts.document(post.id)
         
-        let addLike: [String: Any] = [.likes : post.likes + 1]
+        let addLike : [String: Any] = [.likes : post.likes + 1]
         
         do {
             async let postLike: Void = postLikesRef.setData([:])
@@ -55,7 +55,7 @@ extension PostService {
         let userLikesRef = FirestoreCollections.users.document(currentUserId).collection(.userLikes).document(post.id)
         let postRef = FirestoreCollections.posts.document(post.id)
         
-        let removeLike: [String: Any] = [.likes: post.likes - 1]
+        let removeLike : [String: Any] = [.likes: post.likes - 1]
         
         do {
             async let postLikeDelete: Void = postLikesRef.delete()
@@ -73,14 +73,31 @@ extension PostService {
     /// - Parameter post: The post to check for a like.
     /// - Returns: A boolean indicating whether the user has liked the post.
     /// - Throws: An error if the current user ID cannot be retrieved or if any Firestore operation fails.
-    static func checkIfUserLikePost(_ post: Post) async throws -> Bool {
+//    static func checkIfUserLikePost11(_ post: Post) async throws -> Bool {
+//        guard let currentUserId = Auth.auth().currentUser?.uid else {
+//            // If the current user ID cannot be retrieved, throw an error
+//            throw NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+//        }
+//
+//        let snapshot = try await FirestoreCollections.users.document(currentUserId).collection(.userLikes).document(post.id).getDocument()
+//        return snapshot.exists
+//    }
+    
+    static func checkIfUserLikePost(_ post: Post, completion: @escaping (Result<Bool, Error>) -> Void) {
         guard let currentUserId = Auth.auth().currentUser?.uid else {
-            // If the current user ID cannot be retrieved, throw an error
-            throw NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+            completion(.success(false))
+            return
         }
-
-        let snapshot = try await FirestoreCollections.users.document(currentUserId).collection(.userLikes).document(post.id).getDocument()
-        return snapshot.exists
+        
+        let postLikesRef = FirestoreCollections.users.document(currentUserId).collection(.userLikes).document(post.id)
+        
+        postLikesRef.getDocument  { documentSnapshot, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(documentSnapshot?.exists ?? false))
+            }
+        }
     }
 }
 

@@ -8,17 +8,54 @@
 import SwiftUI
 
 struct ProfileHeaderView: View {
+    @ObservedObject var viewModel: ProfileViewModel
     @State private var showEditView = false
-    let user : User
+    let colors = [Color.red, Color.blue, Color.pink, Color.yellow, Color.red]
+    private var user: User {
+        return viewModel.user
+    }
+    
+    private var isFollowed: Bool {
+        return user.isFollowed ?? false
+    }
+    
+    private var buttonTitle: String {
+        if user.isCurrentUser {
+            return "Edit Profile"
+        } else {
+            return isFollowed ? "Following" : "Follow"
+        }
+    }
+    
+    private var buttonForegroundColor: Color {
+        if user.isCurrentUser || isFollowed {
+            return Color(.label)
+        } else {
+            return Color(.systemBackground)
+        }
+    }
+    
+    private var buttonBackgroundColor: Color {
+        if user.isCurrentUser || isFollowed {
+            return Color(.systemBackground)
+        } else {
+            return Color(.systemBlue)
+        }
+    }
+    
+    init(user: User) {
+        self.viewModel = ProfileViewModel(user: user)
+    }
+
     
     var body: some View {
         VStack (spacing: 10) {
             HStack {
                 RoundedImageView(user.profileImageUrl, size: .xLarge, shape: .circle)
                     .padding(3)
-                    .overlay {
+                    .overlay{
                         Circle()
-                            .stroke(Color(.systemGray4), lineWidth: 1.0)
+                            .stroke(LinearGradient(gradient: Gradient(colors: colors), startPoint: .topLeading, endPoint: .bottomTrailing) , lineWidth: 1.0)
                     }
                 
                 HStack(spacing: 8) {
@@ -47,16 +84,14 @@ struct ProfileHeaderView: View {
                 if user.isCurrentUser {
                     showEditView.toggle()
                 } else {
-                 print("Follow User")
+                 handleFollowTapped()
                 }
-                
-                
             }, label: {
-                Text(user.isCurrentUser ? "Edit Profile" : "Follow")
+                Text(buttonTitle)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
-                    .foregroundStyle(user.isCurrentUser ? Color(.label) : Color(.systemBackground))
-                    .background(user.isCurrentUser ? Color(.systemBackground) : Color(.systemBlue))
+                    .foregroundStyle(buttonForegroundColor)
+                    .background(buttonBackgroundColor)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -70,7 +105,22 @@ struct ProfileHeaderView: View {
         .fullScreenCover(isPresented: $showEditView) {
             NavigationStack { EditProfileView(user: user) }
         }
+        .onAppear {
+            print("🚀  I am onAppear")
+        }
     }
+    
+    
+    func handleFollowTapped () {
+        if isFollowed {
+            viewModel.unFollow()
+        } else {
+            viewModel.follow()
+        }
+    }
+    
+    
+    
 }
 
 //#Preview {

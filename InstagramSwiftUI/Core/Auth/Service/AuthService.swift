@@ -35,18 +35,17 @@ enum AuthServiceError: Error {
 
 class AuthService: ObservableObject {
     @Published var userSession: FirebaseAuth.User?
-
     static let shared = AuthService()
     
     init() {
-        self.userSession = Auth.auth().currentUser
+        Task { try await loadUserData() }
     }
     
     @MainActor
     func login(withEmail email: String, password: String) async throws {
         do {
             let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
-            self.userSession = authResult.user
+            try await loadUserData()
         } catch {
             throw AuthServiceError.firebaseAuthError(error.localizedDescription)
         }
@@ -67,6 +66,7 @@ class AuthService: ObservableObject {
     private func uploadUserData(id: String, email: String, username: String) async throws {
         do {
             let user = User(id: id, username: username, email: email)
+            UserService.currentUser = user
             guard let userEncoder = try? Firestore.Encoder().encode(user) else {
                 throw AuthServiceError.encodingError
             }
@@ -76,8 +76,15 @@ class AuthService: ObservableObject {
         }
     }
     
+    @MainActor
+    func loadUserData() async throws {
+        self.userSession = Auth.auth().currentUser
+        try await UserService.fetchCurrentUser()
+    }
+    
     func signout() {
         try? Auth.auth().signOut()
-//        self.userSession = nil
+        self.userSession = nil
+        UserService.currentUser = nil
     }
 }

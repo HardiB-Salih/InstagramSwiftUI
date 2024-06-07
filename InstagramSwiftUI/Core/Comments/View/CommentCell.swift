@@ -6,25 +6,24 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct CommentCell: View {
+    let comment: Comment
     
-    private var user: User {
-        return User.MOCK_USERS[0]
-    }
     var body: some View {
         HStack (alignment: .top){
-            RoundedImageView(user.profileImageUrl, size: .xxSmall, shape: .circle)
+            RoundedImageView(comment.user?.profileImageUrl, size: .xxSmall, shape: .circle)
             
             VStack (alignment: .leading, spacing: 4) {
                 HStack(spacing: 2) {
-                    Text(user.username)
+                    Text(comment.user?.username ?? "")
                         .fontWeight(.semibold)
-                    Text("6d")
+                    Text(comment.stringTimestamp)
                         .foregroundStyle(.gray)
                 }
                 
-                Text("This is a Comment")
+                Text(comment.commentText)
             }
             .font(.caption)
             Spacer()
@@ -33,5 +32,5 @@ struct CommentCell: View {
 }
 
 #Preview {
-    CommentCell()
+    CommentCell(comment: Comment(commentId: "", commentOwnerId: "", commentText: "This is Comment Test", postId: "", postOwnerId: "", timestamp: Timestamp(), user: User.MOCK_USERS[0]))
 }

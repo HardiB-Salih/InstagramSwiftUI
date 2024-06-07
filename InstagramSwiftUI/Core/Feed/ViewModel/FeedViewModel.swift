@@ -26,7 +26,10 @@ class FeedViewModel: ObservableObject {
     }
     
     func fetchPosts() {
+        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
+        
         let postQuery = FirestoreCollections.posts
+            .whereField(.ownerUid, isNotEqualTo: currentUserId)
             .order(by: .timestamp, descending: true)
         
         listener = postQuery.addSnapshotListener { [weak self] snapshot, error in
@@ -45,7 +48,7 @@ class FeedViewModel: ObservableObject {
                         var updatedPost = post
                         let ownerId = post.ownerUid
                         
-                        async let postUser = UserService.shared.fetchUserBy(userId: ownerId)
+                        async let postUser = UserService.fetchUserBy(userId: ownerId)
 //                        async let didLike = PostService.checkIfUserLikePost(post)
 
                         do {
@@ -59,9 +62,7 @@ class FeedViewModel: ObservableObject {
                     }
                 }
                 
-                DispatchQueue.main.async {
-                    self.posts = updatedPosts
-                }
+                self.posts = updatedPosts
             }
         }
     }

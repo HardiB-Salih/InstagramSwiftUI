@@ -10,10 +10,13 @@ import Firebase
 
 struct FirestoreCollections {
     private static let Root = Firestore.firestore()
+    
     static let users = Root.collection("users")
+    
     static let posts = Root.collection("posts")
-
-    // Add other collections if needed
+    
+    static let following = Root.collection("following")
+    static let followers = Root.collection("followers")
 }
 
 struct MockSamples {

@@ -48,25 +48,21 @@ class EditProfileViewModel : ObservableObject {
             }
             let profileImageUrl = try await ImageUploader.uploadImage(withUIImage: uiImage)
             data[.profileImageUrl] = profileImageUrl
-            self.user.profileImageUrl = profileImageUrl
         }
         
         // update fullname if change
         if !fullname.isEmpty && user.fullname != fullname {
             data[.fullname] = fullname
-            self.user.fullname = fullname
         }
         
         //update bio if change
         if !bio.isEmpty && user.bio != bio {
             data[.bio] = bio
-            self.user.bio = bio
         }
         
         if !data.isEmpty {
             try await FirestoreCollections.users.document(user.id).updateData(data)
-//            self.user = try await UserService.shared.fetchCurrentUser()
+            try await UserService.fetchCurrentUser()
         }
     }
-     
 }

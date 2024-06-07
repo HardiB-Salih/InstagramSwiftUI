@@ -29,21 +29,16 @@ class ContentViewModel: ObservableObject {
                 guard let self else { return }
                 guard let userSession else { return }
                 self.userSession = userSession
-                self.fetchCurrentUser()
             }
             .store(in: &cancellables)
-    }
-
-    private func fetchCurrentUser() {
-        guard userSession != nil else { return }
-
-        Task {
-            do {
-                self.currentUser = try await UserService.shared.fetchCurrentUser()
-                print("✅ Current User \(String(describing: self.currentUser?.id))")
-            } catch {
-                print("❌ Failed to fetch current user: \(error)")
+        
+        UserService.$currentUser
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] currentUser in
+                guard let self else { return }
+                guard let currentUser else { return }
+                self.currentUser = currentUser
             }
-        }
+            .store(in: &cancellables)
     }
 }

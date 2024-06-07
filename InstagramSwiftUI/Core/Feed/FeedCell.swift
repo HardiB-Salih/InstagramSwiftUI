@@ -10,6 +10,7 @@ import Kingfisher
 
 struct FeedCell: View {
     @State private var isAnimating = false
+    @State private var showCommentView = false
     @ObservedObject private var viewModel : FeedCellViewModel
     var post: Post {
         return viewModel.post
@@ -86,7 +87,7 @@ struct FeedCell: View {
                 })
                 
                 Button(action: {
-                    print("Comment on Post")
+                    showCommentView = true
                 }, label: {
                     Image(systemName: "bubble.right")
                         .font(.system(size: 18))
@@ -107,7 +108,7 @@ struct FeedCell: View {
             .foregroundStyle(Color(.label))
             
             //MARK: - Like label
-            if post.likes >= 0 || post.likes <= 0 {
+            if post.likes > 0 && post.likes != 0  {
                 Text("\(post.likes) Likes")
                     .font(.footnote)
                     .fontWeight(.semibold)
@@ -129,16 +130,20 @@ struct FeedCell: View {
             .padding(.vertical, 4)
             
             //MARK: - Timestamp
-            Text("6h ago")
+            Text(post.stringTimestamp)
                 .font(.footnote)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 12)
                 .foregroundStyle(Color(.systemGray))
         }
+        .sheet(isPresented: $showCommentView, content: {
+            CommentView(post: post)
+                .presentationDragIndicator(.visible)
+        })
     }
 }
 
 #Preview {
-    FeedCell(post: Post.MOCK_POSTS.randomElement()!)
+    FeedCell(post: Post.MOCK_POSTS[1])
 }

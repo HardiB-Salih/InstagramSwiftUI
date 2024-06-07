@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct CommentView: View {
+    @StateObject private var viewModel: CommentViewModel
+    var currentUser: User? {
+        return UserService.currentUser
+    }
+    let post : Post
     
-    @State private var text = ""
-    private var user: User {
-        return User.MOCK_USERS[0]
+    init(post: Post) {
+        self.post = post
+        self._viewModel = StateObject(wrappedValue: CommentViewModel(post: post))
     }
     
     let colors = [Color.red, Color.blue, Color.pink, Color.yellow, Color.red]
@@ -21,14 +26,14 @@ struct CommentView: View {
             Text("Comments")
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .padding(8)
+                .padding()
             
             Divider()
             
             ScrollView {
                 LazyVStack (spacing: 12){
-                    ForEach(0 ..< 12) { comment in
-                        CommentCell()
+                    ForEach(viewModel.comments) { comment in
+                        CommentCell(comment: comment)
                             .padding(.horizontal)
                     }
                 }
@@ -38,28 +43,36 @@ struct CommentView: View {
             
             
             HStack (alignment: .bottom) {
-                RoundedImageView(user.profileImageUrl, size: .xSmall, shape: .rounded(cornerRadius: 16))
+                RoundedImageView(currentUser?.profileImageUrl,
+                                 size: .xSmall,
+                                 shape: .rounded(cornerRadius: 16))
                     .padding(2)
                     .overlay{
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(RadialGradient(gradient: Gradient(colors: colors), center: .center, startRadius: 5, endRadius: 500) , lineWidth: 1.0)
+                            .stroke(LinearGradient(gradient: Gradient(colors: colors), startPoint: .topLeading, endPoint: .bottomTrailing) , lineWidth: 1.0)
                     }
                 
                 HStack (alignment: .bottom){
-                    TextField("Add a comment", text: $text, axis: .vertical)
+                    TextField("Add a comment", text: $viewModel.commentText, axis: .vertical)
                         .font(.footnote)
                     
-                    Button(action: {}, label: {
+                    Button(action: {
+                        Task {
+                            await viewModel.uploadComment()
+                            viewModel.commentText = ""
+                        }
+                        
+                    }, label: {
                         Text("Post")
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Color(.systemBlue))
                     })
+                    .disabled(viewModel.commentText.isEmpty)
                 }
                 .padding(12)
                 .overlay{
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(RadialGradient(gradient: Gradient(colors: colors), center: .topLeading, startRadius: 5, endRadius: 500) , lineWidth: 1.0)
+                        .stroke(Color(.systemGray5) , lineWidth: 1.0)
                 }
             }
             .padding(.horizontal)
@@ -68,5 +81,5 @@ struct CommentView: View {
 }
 
 #Preview {
-    CommentView()
+    CommentView(post: Post.MOCK_POSTS[0])
 }
