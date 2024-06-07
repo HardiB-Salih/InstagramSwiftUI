@@ -49,7 +49,7 @@ struct MainTabView: View {
                 .tag(2)
             
             //MARK: - Notification
-            Text("Notification")
+            NotificateView()
                 .tabItem {
                     Image(systemName: selectedTab == 3 ? "heart.fill" : "heart")
                         .environment(\.symbolVariants, selectedTab == 3 ? .fill : .none)

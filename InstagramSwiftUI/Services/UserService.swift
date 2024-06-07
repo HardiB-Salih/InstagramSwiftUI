@@ -252,52 +252,67 @@ extension _UserService {
             }
         }
     }
-
-
-
 }
 
-extension String {
-    static let userFollowing = "user-following"
-    static let userFollowers = "user-followers"
+//MARK: User Stats
+extension _UserService {
+    func fetchUserStats(uid: String) async throws -> UserStats {
+        async let followingCount = FirestoreCollections.following.document(uid).collection(.userFollowing).getDocuments().count
+        async let followersCount = FirestoreCollections.followers.document(uid).collection(.userFollowers).getDocuments().count
+        async let postCount = FirestoreCollections.posts.whereField(.ownerUid, isEqualTo: uid).getDocuments().count
+        
+        print("💿 Fetch User Stats")
+        return try await  UserStats(followingCount: followingCount, followersCount: followersCount, postCount: postCount)
+    }
+    
+    
+    func fetchUsers(forConfig config: UserListConfig) async throws -> [User] {
+        
+        switch config {
+        case .followers(let uid):
+            return try await fetchFollowers(uid: uid)
+        case .following(let uid):
+            return try await fetchFollowing(uid: uid)
+        case .likes(let postId):
+            return try await fetchPostLikesUsers(fromPostId: postId)
+        case .explore:
+            return try await fetchAllUsers()
+        }
+    }
+    
+    
+    private func fetchFollowers(uid: String)  async throws -> [User] {
+        let followersSnapshot = try await FirestoreCollections.followers.document(uid).collection(.userFollowers).getDocuments()
+        return try await fetchUsers(followersSnapshot)
+    }
+    
+    private func fetchFollowing(uid: String)  async throws -> [User] {
+        let followingSnapshot = try await FirestoreCollections.following.document(uid).collection(.userFollowing).getDocuments()
+        return try await fetchUsers(followingSnapshot)
+    }
+    
+    private func fetchPostLikesUsers(fromPostId postId: String)  async throws -> [User] {
+        return []
+    }
+
+    
+    private func fetchUsers(_ snapshot: QuerySnapshot) async throws -> [User] {
+        var users = [User]()
+        for doc in snapshot.documents {
+            let user = try await fetchUserBy(userId: doc.documentID)
+            users.append(user)
+        }
+        return users
+    }
     
 }
 
 
 
 
-//    func follow(uid: String) async throws {
-//        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-//
-//        let userFollowingRef = FirestoreCollections.following.document(currentUserId).collection(.userFollowing).document(uid)
-//        let userFollowersRef = FirestoreCollections.following.document(uid).collection(.userFollowers).document(currentUserId)
-//
-//        do {
-//
-//            async let userFollowing : Void = userFollowingRef.setData([:])
-//            async let userFollowers : Void = userFollowersRef.setData([:])
-//
-//            // Await all tasks to ensure they complete
-//            _ = try await (userFollowing, userFollowers)
-//        } catch {
-//            throw error
-//        }
-//    }
-
-//    func unfollow(uid: String) async throws {
-//        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-//
-//        let userFollowingRef = FirestoreCollections.following.document(currentUserId).collection(.userFollowing).document(uid)
-//        let userFollowersRef = FirestoreCollections.following.document(uid).collection(.userFollowers).document(currentUserId)
-//
-//
-//        do {
-//            async let userFollowing : Void = userFollowingRef.delete()
-//            async let userFollowers : Void = userFollowersRef.delete()
-//
-//            // Await all tasks to ensure they complete
-//            _ = try await (userFollowing, userFollowers)
-//        } catch {
-//            throw error
-//        }
-//    }
+//MARK: String
+extension String {
+    static let userFollowing = "user-following"
+    static let userFollowers = "user-followers"
+    
+}

@@ -22,8 +22,9 @@ class FeedCellViewModel: ObservableObject {
         do {
             let postCopy = post
             post.likes += 1
-            try await PostService.likePost(postCopy)
             post.didLike = true
+            try await PostService.likePost(postCopy)
+            NotificationManager.shared.uploadLikeNotification(toUid: post.ownerUid, post: post)
         } catch {
             print(error.localizedDescription)
             post.didLike = false
@@ -35,8 +36,9 @@ class FeedCellViewModel: ObservableObject {
         do {
             let postCopy = post
             post.likes -= 1
-            try await PostService.unLikePost(postCopy)
             post.didLike = false
+            try await PostService.unLikePost(postCopy)
+            NotificationManager.shared.deleteLikeNotification(toUid: post.ownerUid, post: post)
         } catch {
             print(error.localizedDescription)
             post.didLike = true

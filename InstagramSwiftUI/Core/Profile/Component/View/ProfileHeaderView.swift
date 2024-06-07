@@ -19,6 +19,10 @@ struct ProfileHeaderView: View {
         return user.isFollowed ?? false
     }
     
+    private var stats: UserStats {
+        return user.userStats ?? .init(followingCount: 0, followersCount: 0, postCount: 0)
+    }
+    
     private var buttonTitle: String {
         if user.isCurrentUser {
             return "Edit Profile"
@@ -59,9 +63,17 @@ struct ProfileHeaderView: View {
                     }
                 
                 HStack(spacing: 8) {
-                    UserStatView(value: 3, title: "Posts")
-                    UserStatView(value: 6, title: "Followers")
-                    UserStatView(value: 11, title: "Followring")
+                    UserStatView(value: stats.postCount, title: "Posts")
+                    
+                    NavigationLink(value: UserListConfig.followers(uid: user.id)) {
+                        UserStatView(value: stats.followersCount, title: "Followers")
+                    }
+                    
+                    NavigationLink(value: UserListConfig.following(uid: user.id)) {
+                        UserStatView(value: stats.followingCount, title: "Followring")
+                    }
+                    
+                   
                 }
                 Spacer()
             }
@@ -105,9 +117,10 @@ struct ProfileHeaderView: View {
         .fullScreenCover(isPresented: $showEditView) {
             NavigationStack { EditProfileView(user: user) }
         }
-        .onAppear {
-            print("🚀  I am onAppear")
-        }
+        .navigationDestination(for: UserListConfig.self , destination: { config in
+            UserListView(config: config)
+        })
+        
     }
     
     

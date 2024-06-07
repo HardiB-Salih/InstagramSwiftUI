@@ -13,7 +13,14 @@ class ProfileViewModel: ObservableObject {
     
     init(user: User) {
         self.user = user
+        fetchUserStats()
         checkIfUserFollowed()
+    }
+    
+    func fetchUserStats() {
+        Task {
+            self.user.userStats = try await UserService.fetchUserStats(uid: user.id)
+        }
     }
 }
 
@@ -23,16 +30,20 @@ extension ProfileViewModel {
         Task {
             try await UserService.follow(uid: user.id)
             user.isFollowed = true
+            NotificationManager.shared.uploadFollowNotification(toUid: user.id)
         }
     }
+    
     func unFollow() {
         Task {
             try await UserService.unfollow(uid: user.id)
             user.isFollowed = false
+            NotificationManager.shared.deleteFollowNotification(toUid: user.id)
         }
     }
     
     func checkIfUserFollowed() {
+//        guard user.isFollowed == nil else { return }
         UserService.checkIfUserFollowed(uid: user.id) { result in
             switch result {
             case .success(let success):
@@ -42,5 +53,7 @@ extension ProfileViewModel {
             }
         }
     }
+    
+
     
 }

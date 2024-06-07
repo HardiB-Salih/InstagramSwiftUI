@@ -23,9 +23,16 @@ struct User: Identifiable , Codable {
     }
     
     var isFollowed: Bool? = false
+    var userStats: UserStats?
 }
 
 extension User: Hashable { }
+
+struct UserStats: Codable , Hashable {
+    var followingCount: Int
+    var followersCount: Int
+    var postCount: Int
+}
 
 extension String {
    static let id = "id"

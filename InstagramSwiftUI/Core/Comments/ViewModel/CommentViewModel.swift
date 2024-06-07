@@ -40,6 +40,7 @@ class CommentViewModel: ObservableObject {
         
         do {
             try await CpommentService.uploadComment(comment)
+            NotificationManager.shared.uploadCommentNotification(toUid: post.ownerUid, post: post)
         } catch {
             print("🙀 could not upload comment")
         }

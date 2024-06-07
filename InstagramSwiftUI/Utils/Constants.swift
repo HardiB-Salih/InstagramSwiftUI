@@ -17,6 +17,9 @@ struct FirestoreCollections {
     
     static let following = Root.collection("following")
     static let followers = Root.collection("followers")
+    
+    static let notifications = Root.collection("notifications")
+    
 }
 
 struct MockSamples {

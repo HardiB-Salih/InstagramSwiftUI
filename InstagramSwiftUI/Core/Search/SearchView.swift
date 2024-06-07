@@ -13,22 +13,7 @@ struct SearchView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack (spacing: 8){
-                    ForEach(viewModel.users) { user in
-                        NavigationLink(value: user) {
-                            SearchCell(user: user)
-                        }
-                    }
-                }
-                .navigationDestination(for: User.self, destination: { user in
-                    ProfileView(user: user)
-                })
-                .searchable(text: $srachText)
-            }
-            .scrollIndicators(.hidden)
-            .navigationTitle("Search")
-            .navigationBarTitleDisplayMode(.inline)
+            UserListView(config: .explore)
         }
     }
 }
